@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 WORKDIR /app
-COPY pyproject.toml ./
-RUN pip install poetry && poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
+COPY pyproject.toml .
+RUN pip install --no-cache-dir poetry && poetry config virtualenvs.create false && poetry install --no-root
 COPY help_tulsa_vectorizer ./help_tulsa_vectorizer
-CMD ["help-tulsa-vectorizer"]
+CMD ["python", "-m", "help_tulsa_vectorizer.main"]

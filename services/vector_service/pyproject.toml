@@ -1,18 +1,13 @@
 [tool.poetry]
-name = "help-tulsa-vectorizer"
+name = "help_tulsa_vectorizer"
 version = "0.1.0"
-description = "Vectorization service"
-authors = ["HelpTulsa.ai"]
+description = "Vectorizer service for HelpTulsa.ai"
+authors = ["HelpTulsa"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-qdrant-client = "^1.9"
-pyyaml = "^6.0"
-watchdog = "^3.0"
-sentence-transformers = "^2.2"
-
-[tool.poetry.scripts]
-help-tulsa-vectorizer = "help_tulsa_vectorizer.main:main"
+qdrant-client = "^1.6.0"
+sentence-transformers = "^2.2.2"
 
 [build-system]
 requires = ["poetry-core"]

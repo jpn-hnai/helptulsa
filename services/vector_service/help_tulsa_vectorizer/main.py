@@ -1,57 +1,39 @@
+import json
+import os
 from pathlib import Path
-import yaml
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
-from .embedding import load_model
-import time
-from .qdrant_client import get_qdrant_client, upsert_vectors
 
-DATA_PATH = Path("/app/data/resources.yaml")
-COLLECTION = "help_resources"
-model = None
+from qdrant_client import QdrantClient
+from qdrant_client.http import models as rest
+from sentence_transformers import SentenceTransformer
+
+COLLECTION_NAME = "help_resources"
 
 
-def load_records():
-    if not DATA_PATH.exists():
-        return []
-    with open(DATA_PATH) as f:
-        return yaml.safe_load(f) or []
+def main() -> None:
+    data_file = Path("/app/data/resources.jsonl")
+    if not data_file.exists():
+        print(f"Data file {data_file} not found")
+        return
 
+    client = QdrantClient(host=os.getenv("QDRANT_HOST", "qdrant"), port=int(os.getenv("QDRANT_PORT", "6333")))
+    model = SentenceTransformer("all-MiniLM-L6-v2")
 
-def embed_and_upsert():
-    global model
-    if model is None:
-        model = load_model()
-    records = load_records()
-    if not records:
-        return 0
-    texts = [r.get("description", "") for r in records]
-    vectors = model.encode(texts)
-    client = get_qdrant_client()
-    upsert_vectors(client, COLLECTION, records, vectors)
-    return len(records)
+    client.recreate_collection(
+        COLLECTION_NAME,
+        vectors_config=rest.VectorParams(size=384, distance=rest.Distance.COSINE)
+    )
 
+    points = []
+    with data_file.open() as f:
+        for line in f:
+            rec = json.loads(line)
+            text = " ".join(str(v) for k, v in rec.items() if k != "id")
+            vector = model.encode(text).tolist()
+            points.append(rest.PointStruct(id=rec["id"], vector=vector, payload=rec))
 
-def watch_file():
-    class ReloadHandler(FileSystemEventHandler):
-        def on_modified(self, event):
-            if event.src_path == str(DATA_PATH):
-                embed_and_upsert()
+    client.upsert(collection_name=COLLECTION_NAME, wait=True, points=points)
+    print(f"Upserted {len(points)} records to {COLLECTION_NAME}")
 
-    observer = Observer()
-    observer.schedule(ReloadHandler(), path=str(DATA_PATH.parent))
-    observer.start()
-    try:
-        while True:
-            time.sleep(1)
-    finally:
-        observer.stop()
-        observer.join()
-
-
-def main():
-    embed_and_upsert()
-    watch_file()
 
 if __name__ == "__main__":
     main()
