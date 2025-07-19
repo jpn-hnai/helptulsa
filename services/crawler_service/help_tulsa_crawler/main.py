@@ -13,13 +13,23 @@ def main() -> None:
         print(f"Input file {input_file} not found")
         return
 
-    df = pd.read_excel(input_file)
+    # Load all sheets from the Excel workbook
+    all_sheets = pd.read_excel(input_file, sheet_name=None)
+
+    total_records = 0
     with output_file.open("w") as f:
-        for _, row in df.iterrows():
-            data = {"id": str(uuid.uuid4())}
-            data.update(row.fillna("").to_dict())
-            f.write(json.dumps(data) + "\n")
-    print(f"Wrote {len(df)} resources to {output_file}")
+        for sheet_name, df in all_sheets.items():
+            df = df.dropna(how="all")  # Optional: remove empty rows
+            print(f"🟢 Processing worksheet: {sheet_name} ({len(df)} rows)")
+
+            for _, row in df.iterrows():
+                data = {"id": str(uuid.uuid4()), "source_sheet": sheet_name}
+                data.update(row.fillna("").to_dict())
+                f.write(json.dumps(data) + "\n")
+
+            total_records += len(df)
+
+    print(f"✅ Wrote {total_records} resources to {output_file}")
 
 
 if __name__ == "__main__":
