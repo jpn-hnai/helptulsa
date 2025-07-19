@@ -1,28 +1,26 @@
+import json
+import uuid
 from pathlib import Path
-from typing import Optional
-import typer
 
-from .parser import parse_excel, parse_url, write_resources
-from .scheduler import start_scheduler
+import pandas as pd
 
-app = typer.Typer(help="HelpTulsa resource crawler")
 
-DATA_PATH = Path("/app/data/resources.yaml")
+def main() -> None:
+    input_file = Path("/app/inputs/resources.xlsx")
+    output_file = Path("/app/data/resources.jsonl")
 
-@app.command()
-def ingest(source: str):
-    """Ingest an Excel file or URL into resources.yaml"""
-    if source.startswith("http"):
-        records = parse_url(source)
-    else:
-        records = parse_excel(Path(source))
-    write_resources(DATA_PATH, records)
-    typer.echo(f"Wrote {len(records)} records to {DATA_PATH}")
+    if not input_file.exists():
+        print(f"Input file {input_file} not found")
+        return
 
-@app.command()
-def schedule():
-    """Start the scheduler for nightly diffs"""
-    start_scheduler(DATA_PATH)
+    df = pd.read_excel(input_file)
+    with output_file.open("w") as f:
+        for _, row in df.iterrows():
+            data = {"id": str(uuid.uuid4())}
+            data.update(row.fillna("").to_dict())
+            f.write(json.dumps(data) + "\n")
+    print(f"Wrote {len(df)} resources to {output_file}")
+
 
 if __name__ == "__main__":
-    app()
+    main()

@@ -1,21 +1,15 @@
 [tool.poetry]
-name = "help-tulsa-api"
+name = "help_tulsa_api"
 version = "0.1.0"
-description = "API service"
-authors = ["HelpTulsa.ai"]
+description = "API service for HelpTulsa.ai"
+authors = ["HelpTulsa"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.110"
-uvicorn = "^0.25"
-qdrant-client = "^1.9"
-langchain = "^0.1"
-pyyaml = "^6.0"
-sentence-transformers = "^2.2"
-help-tulsa-vectorizer = {path = "../vector_service"}
-
-[tool.poetry.scripts]
-help-tulsa-api = "help_tulsa_api.main:main"
+fastapi = "^0.104.0"
+uvicorn = {extras = ["standard"], version = "^0.23.2"}
+qdrant-client = "^1.6.0"
+sentence-transformers = "^2.2.2"
 
 [build-system]
 requires = ["poetry-core"]

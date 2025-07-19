@@ -1,23 +1,17 @@
-# HelpTulsa.ai
+# HelpTulsa.ai Microservices
 
-Container-native microservices for managing Tulsa mental health resources. The system ingests data, generates vector embeddings, and serves a FastAPI endpoint for questions.
+This repository contains a minimal, container-native setup for processing mental-health resources.
 
-## Quickstart
+## Services
 
-```bash
-cp .env.example .env
-docker compose up --build
-# In another terminal
-docker compose run --rm api_service pytest
-```
+- **crawler_service**: converts `inputs/resources.xlsx` to `data/resources.jsonl`.
+- **vector_service**: embeds records with Sentence-Transformers and stores them in Qdrant.
+- **api_service**: exposes endpoints for semantic search and refreshing data.
 
-Use the `/admin/refresh` endpoint with the `ADMIN_TOKEN` to re-ingest resources.
+## Usage
 
-### Local Model Setup
+1. Copy `.env.example` to `.env` and adjust values if needed.
+2. Place `resources.xlsx` in the `inputs/` directory.
+3. Run `docker compose up --build`.
 
-Embeddings require the `all-MiniLM-L6-v2` model stored under `./.models`. Run the following once to cache it:
-
-```python
-from sentence_transformers import SentenceTransformer
-SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2').save('./.models/all-MiniLM-L6-v2')
-```
+The API will be available at `http://localhost:8000`.
