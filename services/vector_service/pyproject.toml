@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "help-tulsa-vectorizer"
+version = "0.1.0"
+description = "Vectorization service"
+authors = ["HelpTulsa.ai"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+qdrant-client = "^1.9"
+pyyaml = "^6.0"
+watchdog = "^3.0"
+sentence-transformers = "^2.2"
+
+[tool.poetry.scripts]
+help-tulsa-vectorizer = "help_tulsa_vectorizer.main:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

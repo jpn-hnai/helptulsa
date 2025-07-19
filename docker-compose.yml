@@ -1,0 +1,41 @@
+version: '3.9'
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.9.2
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+  crawler_service:
+    build: ./services/crawler_service
+    volumes:
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+  vector_service:
+    build: ./services/vector_service
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - qdrant
+    environment:
+      - PYTHONUNBUFFERED=1
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+  api_service:
+    build:
+      context: .
+      dockerfile: services/api_service/Dockerfile
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - qdrant
+    environment:
+      - PYTHONUNBUFFERED=1
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - ADMIN_TOKEN=${ADMIN_TOKEN}
+    ports:
+      - "8000:8000"
+volumes:
+  qdrant_data:

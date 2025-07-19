@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "help-tulsa-crawler"
+version = "0.1.0"
+description = "Crawler for HelpTulsa resources"
+authors = ["HelpTulsa.ai"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pandas = "^2.0"
+pyyaml = "^6.0"
+typer = {extras = ["all"], version = "^0.9"}
+watchdog = "^3.0"
+
+[tool.poetry.scripts]
+help-tulsa-crawler = "help_tulsa_crawler.main:app"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
