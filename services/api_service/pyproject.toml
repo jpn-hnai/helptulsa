@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "help-tulsa-api"
+version = "0.1.0"
+description = "API service"
+authors = ["HelpTulsa.ai"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.110"
+uvicorn = "^0.25"
+qdrant-client = "^1.9"
+langchain = "^0.1"
+pyyaml = "^6.0"
+sentence-transformers = "^2.2"
+help-tulsa-vectorizer = {path = "../vector_service"}
+
+[tool.poetry.scripts]
+help-tulsa-api = "help_tulsa_api.main:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
