@@ -1,4 +1,4 @@
-# HelpTulsa.ai Microservices
+# Lifeline Connect - HelpTulsa.ai Microservices
 
 This repository contains a minimal, container-native setup for processing mental-health resources.
 
